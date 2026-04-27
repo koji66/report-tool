@@ -149,7 +149,9 @@ export default function Home() {
             </p>
 
             <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
+              <a href="サブスクURL" target="_blank">
               <button>無制限でレポート構成を作成（500円/月）</button>
+               </a>
               <button>10回分を追加する（100円）</button>
             </div>
           </div>
