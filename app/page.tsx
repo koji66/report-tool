@@ -200,11 +200,11 @@ export default function Home() {
             }}
           >
             <h2 style={{ fontSize: 20, marginBottom: 8 }}>
-              無料利用は終了しました
+              無料トライアルは終了しました
             </h2>
 
             <p style={{ color: "#555", lineHeight: 1.7 }}>
-              続けて利用する場合は、月額プランまたは追加回数の購入を選択できます。
+              引き続き利用するには、無制限プランまたは追加回数をご利用ください。
             </p>
 
             <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
@@ -219,7 +219,7 @@ export default function Home() {
                   cursor: "pointer",
                 }}
               >
-                月額500円で無制限利用
+                無制限でレポート構成を作成（500円/月）
               </button>
 
               <button
@@ -233,7 +233,7 @@ export default function Home() {
                   cursor: "pointer",
                 }}
               >
-                追加10回を100円で購入
+                 10回分を追加する（100円）
               </button>
             </div>
           </div>
