@@ -144,15 +144,70 @@ export default function Home() {
           {loading ? "生成中..." : "構成を作成"}
         </button>
 
-        {result && (
-          <section
+       {result && (
+  <>
+    <section
+      style={{
+        marginTop: 28,
+        padding: 20,
+        background: "#fafafa",
+        border: "1px solid #eee",
+        borderRadius: 14,
+      }}
+    >
+      {/* ここに結果表示そのまま */}
+    </section>
+
+    {remainingCount <= 0 && (
+      <div
+        style={{
+          marginTop: 20,
+          padding: 20,
+          background: "#fff7ed",
+          border: "1px solid #fed7aa",
+          borderRadius: 14,
+        }}
+      >
+        <h2 style={{ fontSize: 20, marginBottom: 8 }}>
+          無料利用は終了しました
+        </h2>
+
+        <p style={{ color: "#555", lineHeight: 1.7 }}>
+          続けて利用する場合は、月額プランまたは追加回数の購入を選択できます。
+        </p>
+
+        <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
+          <button
             style={{
-              marginTop: 28,
-              padding: 20,
-              background: "#fafafa",
-              border: "1px solid #eee",
-              borderRadius: 14,
+              padding: 14,
+              background: "#111",
+              color: "#fff",
+              border: "none",
+              borderRadius: 12,
+              fontWeight: "bold",
             }}
+          >
+            月額500円で無制限利用
+          </button>
+
+          <button
+            style={{
+              padding: 14,
+              background: "#fff",
+              color: "#111",
+              border: "1px solid #ccc",
+              borderRadius: 12,
+              fontWeight: "bold",
+            }}
+          >
+            追加10回を100円で購入
+          </button>
+        </div>
+      </div>
+    )}
+  </>
+)}
+            
           >
             <div
               style={{
