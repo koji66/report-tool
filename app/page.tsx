@@ -42,7 +42,6 @@ export default function Home() {
 
       if (!res.ok) {
         alert(data.error || "エラーが発生しました");
-        setLoading(false);
         return;
       }
 
@@ -83,9 +82,7 @@ export default function Home() {
           boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
         }}
       >
-        <h1 style={{ fontSize: 28, marginBottom: 8 }}>
-          Structify
-        </h1>
+        <h1 style={{ fontSize: 28, marginBottom: 8 }}>Structify</h1>
 
         <p style={{ color: "#555", lineHeight: 1.7, marginBottom: 16 }}>
           授業メモや資料メモを貼るだけで、整理されたノートとレポート構成を作成します。
@@ -101,7 +98,7 @@ export default function Home() {
             marginBottom: 18,
           }}
         >
-          PC利用推奨 / 無料利用：残り {remainingCount} 回
+          PC利用推奨 / 初回無料：残り {remainingCount} 回
         </div>
 
         <label style={{ fontWeight: "bold", display: "block", marginBottom: 8 }}>
@@ -141,74 +138,19 @@ export default function Home() {
             fontWeight: "bold",
           }}
         >
-          {loading ? "生成中..." : "構成を作成"}
+          {loading ? "生成中..." : "レポート構成を生成する"}
         </button>
 
-       {result && (
-  <>
-    <section
-      style={{
-        marginTop: 28,
-        padding: 20,
-        background: "#fafafa",
-        border: "1px solid #eee",
-        borderRadius: 14,
-      }}
-    >
-      {/* ここに結果表示そのまま */}
-    </section>
-
-    {remainingCount <= 0 && (
-      <div
-        style={{
-          marginTop: 20,
-          padding: 20,
-          background: "#fff7ed",
-          border: "1px solid #fed7aa",
-          borderRadius: 14,
-        }}
-      >
-        <h2 style={{ fontSize: 20, marginBottom: 8 }}>
-          無料利用は終了しました
-        </h2>
-
-        <p style={{ color: "#555", lineHeight: 1.7 }}>
-          続けて利用する場合は、月額プランまたは追加回数の購入を選択できます。
-        </p>
-
-        <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
-          <button
+        {result && (
+          <section
             style={{
-              padding: 14,
-              background: "#111",
-              color: "#fff",
-              border: "none",
-              borderRadius: 12,
-              fontWeight: "bold",
+              marginTop: 28,
+              padding: 20,
+              background: "#fafafa",
+              border: "1px solid #eee",
+              borderRadius: 14,
             }}
           >
-            月額500円で無制限利用
-          </button>
-
-          <button
-            style={{
-              padding: 14,
-              background: "#fff",
-              color: "#111",
-              border: "1px solid #ccc",
-              borderRadius: 12,
-              fontWeight: "bold",
-            }}
-          >
-            追加10回を100円で購入
-          </button>
-        </div>
-      </div>
-    )}
-  </>
-)}
-            
-          
             <div
               style={{
                 display: "flex",
@@ -245,6 +187,56 @@ export default function Home() {
               {result}
             </pre>
           </section>
+        )}
+
+        {remainingCount <= 0 && (
+          <div
+            style={{
+              marginTop: 20,
+              padding: 20,
+              background: "#fff7ed",
+              border: "1px solid #fed7aa",
+              borderRadius: 14,
+            }}
+          >
+            <h2 style={{ fontSize: 20, marginBottom: 8 }}>
+              無料利用は終了しました
+            </h2>
+
+            <p style={{ color: "#555", lineHeight: 1.7 }}>
+              続けて利用する場合は、月額プランまたは追加回数の購入を選択できます。
+            </p>
+
+            <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
+              <button
+                style={{
+                  padding: 14,
+                  background: "#111",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 12,
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                }}
+              >
+                月額500円で無制限利用
+              </button>
+
+              <button
+                style={{
+                  padding: 14,
+                  background: "#fff",
+                  color: "#111",
+                  border: "1px solid #ccc",
+                  borderRadius: 12,
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                }}
+              >
+                追加10回を100円で購入
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </main>
