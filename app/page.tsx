@@ -31,7 +31,7 @@ if (!res.ok) {
 
 setResult(data.result);
 
-    localStorage.setItem("count", count + 1);
+    localStorage.setItem("count", String(count + 1));
     setLoading(false);
   };
 
