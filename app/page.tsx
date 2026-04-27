@@ -149,11 +149,40 @@ export default function Home() {
             </p>
 
             <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
-              <a href="サブスクURL" target="_blank">
-              <button>無制限でレポート構成を作成（500円/月）</button>
-               </a>
-              <button>10回分を追加する（100円）</button>
-            </div>
+  <a href="サブスクURL" target="_blank" rel="noopener noreferrer">
+    <button
+      style={{
+        padding: 14,
+        width: "100%",
+        background: "#111",
+        color: "#fff",
+        border: "none",
+        borderRadius: 12,
+        fontWeight: "bold",
+        cursor: "pointer",
+      }}
+    >
+      無制限でレポート構成を作成（500円/月）
+    </button>
+  </a>
+
+  <a href="100円URL" target="_blank" rel="noopener noreferrer">
+    <button
+      style={{
+        padding: 14,
+        width: "100%",
+        background: "#fff",
+        color: "#111",
+        border: "1px solid #ccc",
+        borderRadius: 12,
+        fontWeight: "bold",
+        cursor: "pointer",
+      }}
+    >
+      10回分を追加する（100円）
+    </button>
+  </a>
+</div>
           </div>
         )}
 
