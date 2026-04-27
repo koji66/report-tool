@@ -101,10 +101,6 @@ export default function Home() {
           PC利用推奨 / 初回無料：残り {remainingCount} 回
         </div>
 
-        <label style={{ fontWeight: "bold", display: "block", marginBottom: 8 }}>
-          メモを入力
-        </label>
-
         <textarea
           rows={12}
           style={{
@@ -113,13 +109,9 @@ export default function Home() {
             borderRadius: 12,
             border: "1px solid #ddd",
             fontSize: 15,
-            lineHeight: 1.6,
-            resize: "vertical",
-            boxSizing: "border-box",
           }}
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="例：地球温暖化の原因、二酸化炭素、森林破壊、海面上昇、再生可能エネルギー..."
         />
 
         <button
@@ -133,61 +125,12 @@ export default function Home() {
             color: "#fff",
             border: "none",
             borderRadius: 12,
-            cursor: loading || remainingCount <= 0 ? "not-allowed" : "pointer",
-            fontSize: 16,
+            cursor: "pointer",
             fontWeight: "bold",
           }}
         >
           {loading ? "生成中..." : "レポート構成を生成する"}
         </button>
-
-        {result && (
-          <section
-            style={{
-              marginTop: 28,
-              padding: 20,
-              background: "#fafafa",
-              border: "1px solid #eee",
-              borderRadius: 14,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                gap: 12,
-                alignItems: "center",
-                marginBottom: 12,
-              }}
-            >
-              <h2 style={{ fontSize: 20, margin: 0 }}>生成結果</h2>
-
-              <button
-                onClick={handleCopy}
-                style={{
-                  padding: "8px 14px",
-                  background: "#fff",
-                  border: "1px solid #ccc",
-                  borderRadius: 8,
-                  cursor: "pointer",
-                }}
-              >
-                {copied ? "コピー済み" : "コピー"}
-              </button>
-            </div>
-
-            <pre
-              style={{
-                whiteSpace: "pre-wrap",
-                lineHeight: 1.7,
-                fontSize: 15,
-                margin: 0,
-              }}
-            >
-              {result}
-            </pre>
-          </section>
-        )}
 
         {remainingCount <= 0 && (
           <div
@@ -199,45 +142,40 @@ export default function Home() {
               borderRadius: 14,
             }}
           >
-            <h2 style={{ fontSize: 20, marginBottom: 8 }}>
-              無料トライアルは終了しました
-            </h2>
+            <h2>無料トライアルは終了しました</h2>
 
-            <p style={{ color: "#555", lineHeight: 1.7 }}>
+            <p>
               引き続き利用するには、無制限プランまたは追加回数をご利用ください。
             </p>
 
             <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
-              <button
-                style={{
-                  padding: 14,
-                  background: "#111",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 12,
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                }}
-              >
-                無制限でレポート構成を作成（500円/月）
-              </button>
-
-              <button
-                style={{
-                  padding: 14,
-                  background: "#fff",
-                  color: "#111",
-                  border: "1px solid #ccc",
-                  borderRadius: 12,
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                }}
-              >
-                 10回分を追加する（100円）
-              </button>
+              <button>無制限でレポート構成を作成（500円/月）</button>
+              <button>10回分を追加する（100円）</button>
             </div>
           </div>
         )}
+
+        {/* ★ここ追加（フッター） */}
+        <footer
+          style={{
+            marginTop: 32,
+            paddingTop: 20,
+            borderTop: "1px solid #eee",
+            fontSize: 13,
+            color: "#666",
+            textAlign: "center",
+          }}
+        >
+          <a
+            href="/legal"
+            style={{
+              color: "#666",
+              textDecoration: "none",
+            }}
+          >
+            特定商取引法に基づく表記
+          </a>
+        </footer>
       </div>
     </main>
   );
