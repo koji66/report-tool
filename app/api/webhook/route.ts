@@ -4,6 +4,16 @@ import { supabaseAdmin } from "@/lib/supabase";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
+async function findUser(email: string) {
+  const { data } = await supabaseAdmin
+    .from("users")
+    .select("*")
+    .eq("email", email)
+    .maybeSingle();
+
+  return data;
+}
+
 export async function POST(req: Request) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
@@ -24,56 +34,54 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Webhook signature error" }, { status: 400 });
   }
 
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session;
+  if (event.type !== "checkout.session.completed") {
+    return NextResponse.json({ received: true });
+  }
 
-    const email = session.customer_details?.email;
+  const session = event.data.object as Stripe.Checkout.Session;
+  const email = session.customer_details?.email;
 
-    if (!email) {
-      return NextResponse.json({ error: "No email" }, { status: 400 });
-    }
+  if (!email) {
+    return NextResponse.json({ error: "No email" }, { status: 400 });
+  }
 
-    if (session.mode === "subscription") {
-      const { error } = await supabaseAdmin.from("users").upsert(
-        {
-          email,
+  const user = await findUser(email);
+
+  if (session.mode === "subscription") {
+    if (user) {
+      await supabaseAdmin
+        .from("users")
+        .update({
           plan: "pro",
           updated_at: new Date().toISOString(),
-        },
-        { onConflict: "email" }
-      );
-
-      if (error) {
-        return NextResponse.json({ error }, { status: 500 });
-      }
+        })
+        .eq("email", email);
+    } else {
+      await supabaseAdmin.from("users").insert({
+        email,
+        plan: "pro",
+        extra_credits: 0,
+      });
     }
+  }
 
-    if (session.mode === "payment") {
-      const { data: user, error: selectError } = await supabaseAdmin
+  if (session.mode === "payment") {
+    const currentCredits = user?.extra_credits || 0;
+
+    if (user) {
+      await supabaseAdmin
         .from("users")
-        .select("extra_credits")
-        .eq("email", email)
-        .single();
-
-      if (selectError && selectError.code !== "PGRST116") {
-        return NextResponse.json({ error: selectError }, { status: 500 });
-      }
-
-      const currentCredits = user?.extra_credits || 0;
-
-      const { error } = await supabaseAdmin.from("users").upsert(
-        {
-          email,
-          plan: "free",
+        .update({
           extra_credits: currentCredits + 10,
           updated_at: new Date().toISOString(),
-        },
-        { onConflict: "email" }
-      );
-
-      if (error) {
-        return NextResponse.json({ error }, { status: 500 });
-      }
+        })
+        .eq("email", email);
+    } else {
+      await supabaseAdmin.from("users").insert({
+        email,
+        plan: "free",
+        extra_credits: 10,
+      });
     }
   }
 
