@@ -149,7 +149,7 @@ export default function Home() {
             </p>
 
             <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
-  <a href="サブスクURL" target="_blank" rel="noopener noreferrer">
+  <a href="https://buy.stripe.com/8x27sFcal6CpgU96avao802" target="_blank" rel="noopener noreferrer">
     <button
       style={{
         padding: 14,
@@ -166,7 +166,7 @@ export default function Home() {
     </button>
   </a>
 
-  <a href="100円URL" target="_blank" rel="noopener noreferrer">
+  <a href="https://buy.stripe.com/aFadR36Q1gcZavLfL5ao801" target="_blank" rel="noopener noreferrer">
     <button
       style={{
         padding: 14,
