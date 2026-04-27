@@ -1,117 +1,197 @@
 "use client";
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
+
+const MAX_FREE_COUNT = 3;
 
 export default function Home() {
   const [text, setText] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [usedCount, setUsedCount] = useState(0);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const count = Number(localStorage.getItem("count") || 0);
+    setUsedCount(count);
+  }, []);
+
+  const remainingCount = Math.max(MAX_FREE_COUNT - usedCount, 0);
 
   const handleGenerate = async () => {
-    let count = Number(localStorage.getItem("count") || 0);
+    if (!text.trim()) {
+      alert("メモを入力してください");
+      return;
+    }
 
-    if (count >= 3) {
+    if (usedCount >= MAX_FREE_COUNT) {
       alert("無料回数は3回までです");
       return;
     }
 
     setLoading(true);
+    setResult("");
 
-    const res = await fetch("/api/generate", {
-      method: "POST",
-      body: JSON.stringify({ text }),
-    });
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        body: JSON.stringify({ text }),
+      });
 
-  const data = await res.json();
+      const data = await res.json();
 
-if (!res.ok) {
-  alert(data.error || "エラーが発生しました");
-  setLoading(false);
-  return;
-}
+      if (!res.ok) {
+        alert(data.error || "エラーが発生しました");
+        setLoading(false);
+        return;
+      }
 
-setResult(data.result);
+      setResult(data.result);
 
-    localStorage.setItem("count", String(count + 1));
-    setLoading(false);
+      const nextCount = usedCount + 1;
+      localStorage.setItem("count", String(nextCount));
+      setUsedCount(nextCount);
+    } catch {
+      alert("通信エラーが発生しました");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(result);
-    alert("コピーしました");
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(result);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <main style={{
-      maxWidth: 600,
-      margin: "0 auto",
-      padding: 20,
-      fontFamily: "sans-serif"
-    }}>
-      <h1 style={{ fontSize: 24, marginBottom: 10 }}>
-        レポート構成ツール
-      </h1>
-
-      <p style={{ color: "#666", fontSize: 12 }}>
-        ※PC推奨（スマホ非対応）
-      </p>
-
-      <textarea
-        rows={10}
+    <main
+      style={{
+        minHeight: "100vh",
+        background: "#f5f5f5",
+        padding: "40px 20px",
+        fontFamily: "sans-serif",
+      }}
+    >
+      <div
         style={{
-          width: "100%",
-          padding: 10,
-          borderRadius: 8,
-          border: "1px solid #ccc",
-          marginTop: 10
-        }}
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="メモを入力"
-      />
-
-      <button
-        onClick={handleGenerate}
-        style={{
-          marginTop: 10,
-          width: "100%",
-          padding: 12,
-          backgroundColor: "#000",
-          color: "#fff",
-          border: "none",
-          borderRadius: 8,
-          cursor: "pointer"
+          maxWidth: 760,
+          margin: "0 auto",
+          background: "#fff",
+          borderRadius: 16,
+          padding: 28,
+          boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
         }}
       >
-        {loading ? "生成中..." : "構成を作成"}
-      </button>
+        <h1 style={{ fontSize: 28, marginBottom: 8 }}>
+          Structify
+        </h1>
 
-      {result && (
-        <div style={{
-          marginTop: 20,
-          padding: 15,
-          background: "#f7f7f7",
-          borderRadius: 8
-        }}>
-          <pre style={{ whiteSpace: "pre-wrap" }}>
-            {result}
-          </pre>
+        <p style={{ color: "#555", lineHeight: 1.7, marginBottom: 16 }}>
+          授業メモや資料メモを貼るだけで、整理されたノートとレポート構成を作成します。
+        </p>
 
-          <button
-            onClick={handleCopy}
+        <div
+          style={{
+            background: "#f1f1f1",
+            padding: 12,
+            borderRadius: 10,
+            fontSize: 14,
+            color: "#555",
+            marginBottom: 18,
+          }}
+        >
+          PC利用推奨 / 無料利用：残り {remainingCount} 回
+        </div>
+
+        <label style={{ fontWeight: "bold", display: "block", marginBottom: 8 }}>
+          メモを入力
+        </label>
+
+        <textarea
+          rows={12}
+          style={{
+            width: "100%",
+            padding: 14,
+            borderRadius: 12,
+            border: "1px solid #ddd",
+            fontSize: 15,
+            lineHeight: 1.6,
+            resize: "vertical",
+            boxSizing: "border-box",
+          }}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="例：地球温暖化の原因、二酸化炭素、森林破壊、海面上昇、再生可能エネルギー..."
+        />
+
+        <button
+          onClick={handleGenerate}
+          disabled={loading || remainingCount <= 0}
+          style={{
+            marginTop: 16,
+            width: "100%",
+            padding: 14,
+            backgroundColor: loading || remainingCount <= 0 ? "#999" : "#111",
+            color: "#fff",
+            border: "none",
+            borderRadius: 12,
+            cursor: loading || remainingCount <= 0 ? "not-allowed" : "pointer",
+            fontSize: 16,
+            fontWeight: "bold",
+          }}
+        >
+          {loading ? "生成中..." : "構成を作成"}
+        </button>
+
+        {result && (
+          <section
             style={{
-              marginTop: 10,
-              width: "100%",
-              padding: 10,
-              backgroundColor: "#fff",
-              border: "1px solid #ccc",
-              borderRadius: 8,
-              cursor: "pointer"
+              marginTop: 28,
+              padding: 20,
+              background: "#fafafa",
+              border: "1px solid #eee",
+              borderRadius: 14,
             }}
           >
-            コピー
-          </button>
-        </div>
-      )}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: 12,
+                alignItems: "center",
+                marginBottom: 12,
+              }}
+            >
+              <h2 style={{ fontSize: 20, margin: 0 }}>生成結果</h2>
+
+              <button
+                onClick={handleCopy}
+                style={{
+                  padding: "8px 14px",
+                  background: "#fff",
+                  border: "1px solid #ccc",
+                  borderRadius: 8,
+                  cursor: "pointer",
+                }}
+              >
+                {copied ? "コピー済み" : "コピー"}
+              </button>
+            </div>
+
+            <pre
+              style={{
+                whiteSpace: "pre-wrap",
+                lineHeight: 1.7,
+                fontSize: 15,
+                margin: 0,
+              }}
+            >
+              {result}
+            </pre>
+          </section>
+        )}
+      </div>
     </main>
   );
 }
