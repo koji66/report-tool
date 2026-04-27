@@ -149,7 +149,7 @@ export default function Home() {
             </p>
 
             <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
-  <a href="https://buy.stripe.com/test_aFadR36Q1gcZavLfL5ao801" target="_blank" rel="noopener noreferrer">
+  <a href="https://buy.stripe.com/test_8x27sFcal6CpgU96avao802" target="_blank" rel="noopener noreferrer">
     <button
       style={{
         padding: 14,
@@ -166,7 +166,7 @@ export default function Home() {
     </button>
   </a>
 
-  <a href="https://buy.stripe.com/test_6oUeV7fmx2m9eM16avao800" target="_blank" rel="noopener noreferrer">
+  <a href="https://buy.stripe.com/test_4gMcMZdep0e1avL8iDao803" target="_blank" rel="noopener noreferrer">
     <button
       style={{
         padding: 14,
