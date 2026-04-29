@@ -101,11 +101,26 @@ export default function Home() {
     }
   };
 
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(result);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+ const handleManagePlan = async () => {
+  if (!email.trim()) {
+    alert("メールアドレスを入力してください");
+    return;
+  }
+
+  const res = await fetch("/api/create-portal-session", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.error || "解約ページを開けませんでした");
+    return;
+  }
+
+  window.location.href = data.url;
+};
 
   return (
     <main
