@@ -10,6 +10,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [usedCount, setUsedCount] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     const count = Number(localStorage.getItem("count") || 0);
@@ -28,7 +29,30 @@ export default function Home() {
       alert("無料回数は3回までです");
       return;
     }
+    if (!email.trim()) {
+  alert("メールアドレスを入力してください");
+  return;
+}
 
+const statusRes = await fetch("/api/user-status", {
+  method: "POST",
+  body: JSON.stringify({ email }),
+});
+
+const status = await statusRes.json();
+
+if (!statusRes.ok) {
+  alert("利用状況の確認に失敗しました");
+  return;
+}
+
+const isPro = status.plan === "pro";
+const hasCredit = status.extra_credits > 0;
+
+if (!isPro && !hasCredit && usedCount >= MAX_FREE_COUNT) {
+  alert("無料回数は終了しました。追加購入または月額プランをご利用ください。");
+  return;
+}
     setLoading(true);
     setResult("");
 
@@ -46,6 +70,12 @@ export default function Home() {
       }
 
       setResult(data.result);
+      if (status.plan !== "pro" && status.extra_credits > 0) {
+       await fetch("/api/use-credit", {
+        method: "POST",
+         body: JSON.stringify({ email }),
+      });
+}
 
       const nextCount = usedCount + 1;
       localStorage.setItem("count", String(nextCount));
@@ -100,7 +130,21 @@ export default function Home() {
         >
           PC利用推奨 / 初回無料：残り {remainingCount} 回
         </div>
-
+        <input
+           type="email"
+           value={email}
+           onChange={(e) => setEmail(e.target.value)}
+           placeholder="購入時に使ったメールアドレス"
+          style={{
+            width: "100%",
+            padding: 14,
+            borderRadius: 12,
+            border: "1px solid #ddd",
+            fontSize: 15,
+            marginBottom: 12,
+            boxSizing: "border-box",
+        }}
+/>
         <textarea
           rows={12}
           style={{
