@@ -6,11 +6,14 @@ const MAX_FREE_COUNT = 3;
 
 export default function Home() {
   const [text, setText] = useState("");
+  const [email, setEmail] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [usedCount, setUsedCount] = useState(0);
   const [copied, setCopied] = useState(false);
-  const [email, setEmail] = useState("");
+
+  const [plan, setPlan] = useState("free");
+  const [extraCredits, setExtraCredits] = useState(0);
 
   useEffect(() => {
     const count = Number(localStorage.getItem("count") || 0);
@@ -19,73 +22,84 @@ export default function Home() {
 
   const remainingCount = Math.max(MAX_FREE_COUNT - usedCount, 0);
 
-const handleGenerate = async () => {
-  if (!text.trim()) {
-    alert("メモを入力してください");
-    return;
-  }
+  const canUse =
+    plan === "pro" || extraCredits > 0 || remainingCount > 0;
 
-  if (!email.trim()) {
-    alert("メールアドレスを入力してください");
-    return;
-  }
-
-  const statusRes = await fetch("/api/user-status", {
-    method: "POST",
-    body: JSON.stringify({ email }),
-  });
-
-  const status = await statusRes.json();
-
-  if (!statusRes.ok) {
-    alert("利用状況の確認に失敗しました");
-    return;
-  }
-
-  const isPro = status.plan === "pro";
-  const hasCredit = status.extra_credits > 0;
-
-  if (!isPro && !hasCredit && usedCount >= MAX_FREE_COUNT) {
-    alert("無料回数は終了しました。追加購入または月額プランをご利用ください。");
-    return;
-  }
-
-  setLoading(true);
-  setResult("");
-
-  try {
-    const res = await fetch("/api/generate", {
-      method: "POST",
-      body: JSON.stringify({ text }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert(data.error || "エラーが発生しました");
+  const handleGenerate = async () => {
+    if (!text.trim()) {
+      alert("メモを入力してください");
       return;
     }
 
-    setResult(data.result);
+    if (!email.trim()) {
+      alert("メールアドレスを入力してください");
+      return;
+    }
 
-    if (!isPro && hasCredit) {
-      await fetch("/api/use-credit", {
+    const statusRes = await fetch("/api/user-status", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+
+    const status = await statusRes.json();
+
+    if (!statusRes.ok) {
+      alert("利用状況の確認に失敗しました");
+      return;
+    }
+
+    const currentPlan = status.plan || "free";
+    const currentCredits = status.extra_credits || 0;
+
+    setPlan(currentPlan);
+    setExtraCredits(currentCredits);
+
+    const isPro = currentPlan === "pro";
+    const hasCredit = currentCredits > 0;
+
+    if (!isPro && !hasCredit && usedCount >= MAX_FREE_COUNT) {
+      alert("無料回数は終了しました。追加購入または月額プランをご利用ください。");
+      return;
+    }
+
+    setLoading(true);
+    setResult("");
+
+    try {
+      const res = await fetch("/api/generate", {
         method: "POST",
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ text }),
       });
-    }
 
-    if (!isPro && !hasCredit) {
-      const nextCount = usedCount + 1;
-      localStorage.setItem("count", String(nextCount));
-      setUsedCount(nextCount);
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "エラーが発生しました");
+        return;
+      }
+
+      setResult(data.result);
+
+      if (!isPro && hasCredit) {
+        await fetch("/api/use-credit", {
+          method: "POST",
+          body: JSON.stringify({ email }),
+        });
+
+        setExtraCredits((prev) => Math.max(prev - 1, 0));
+      }
+
+      if (!isPro && !hasCredit) {
+        const nextCount = usedCount + 1;
+        localStorage.setItem("count", String(nextCount));
+        setUsedCount(nextCount);
+      }
+    } catch {
+      alert("通信エラーが発生しました");
+    } finally {
+      setLoading(false);
     }
-  } catch {
-    alert("通信エラーが発生しました");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(result);
@@ -129,12 +143,15 @@ const handleGenerate = async () => {
           }}
         >
           PC利用推奨 / 初回無料：残り {remainingCount} 回
+          {plan === "pro" && " / 無制限プラン利用中"}
+          {extraCredits > 0 && ` / 追加クレジット：${extraCredits} 回`}
         </div>
+
         <input
-           type="email"
-           value={email}
-           onChange={(e) => setEmail(e.target.value)}
-           placeholder="購入時に使ったメールアドレス"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="購入時に使ったメールアドレス"
           style={{
             width: "100%",
             padding: 14,
@@ -143,8 +160,9 @@ const handleGenerate = async () => {
             fontSize: 15,
             marginBottom: 12,
             boxSizing: "border-box",
-        }}
-/>
+          }}
+        />
+
         <textarea
           rows={12}
           style={{
@@ -153,32 +171,81 @@ const handleGenerate = async () => {
             borderRadius: 12,
             border: "1px solid #ddd",
             fontSize: 15,
+            boxSizing: "border-box",
           }}
+          placeholder="例：地球温暖化の原因、二酸化炭素、森林破壊、海面上昇、再生可能エネルギー..."
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
-        <div>
-         {loading ? "loading中" : "ready"}
+
+        <div style={{ marginTop: 8, fontSize: 13, color: "#777" }}>
+          {loading ? "生成中..." : "ready"}
         </div>
+
         <button
           onClick={handleGenerate}
-          disabled={loading || !text.trim() || !email.trim()}
+          disabled={loading || !text.trim() || !email.trim() || !canUse}
           style={{
             marginTop: 16,
             width: "100%",
             padding: 14,
-            backgroundColor: loading || remainingCount <= 0 ? "#999" : "#111",
+            backgroundColor:
+              loading || !canUse ? "#999" : "#111",
             color: "#fff",
             border: "none",
             borderRadius: 12,
-            cursor: "pointer",
+            cursor:
+              loading || !text.trim() || !email.trim() || !canUse
+                ? "not-allowed"
+                : "pointer",
             fontWeight: "bold",
           }}
         >
           {loading ? "生成中..." : "レポート構成を生成する"}
         </button>
 
-        {remainingCount <= 0 && (
+        {result && (
+          <section
+            style={{
+              marginTop: 28,
+              padding: 20,
+              background: "#fafafa",
+              border: "1px solid #eee",
+              borderRadius: 14,
+            }}
+          >
+            <h2 style={{ fontSize: 20, marginBottom: 12 }}>生成結果</h2>
+
+            <pre
+              style={{
+                whiteSpace: "pre-wrap",
+                lineHeight: 1.7,
+                fontSize: 14,
+              }}
+            >
+              {result}
+            </pre>
+
+            <button
+              onClick={handleCopy}
+              style={{
+                marginTop: 16,
+                padding: 12,
+                width: "100%",
+                background: "#111",
+                color: "#fff",
+                border: "none",
+                borderRadius: 12,
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+            >
+              {copied ? "コピーしました" : "結果をコピー"}
+            </button>
+          </section>
+        )}
+
+        {!canUse && (
           <div
             style={{
               marginTop: 20,
@@ -195,44 +262,51 @@ const handleGenerate = async () => {
             </p>
 
             <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
-  <a href="https://buy.stripe.com/test_8x27sFcal6CpgU96avao802" target="_blank" rel="noopener noreferrer">
-    <button
-      style={{
-        padding: 14,
-        width: "100%",
-        background: "#111",
-        color: "#fff",
-        border: "none",
-        borderRadius: 12,
-        fontWeight: "bold",
-        cursor: "pointer",
-      }}
-    >
-      無制限でレポート構成を作成（500円/月）
-    </button>
-  </a>
+              <a
+                href="https://buy.stripe.com/test_8x27sFca16CpgU96avao802"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <button
+                  style={{
+                    padding: 14,
+                    width: "100%",
+                    background: "#111",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 12,
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                  }}
+                >
+                  無制限でレポート構成を作成（500円/月）
+                </button>
+              </a>
 
-  <a href="https://buy.stripe.com/test_4gMcMZdep0e1avL8iDao803" target="_blank" rel="noopener noreferrer">
-    <button
-      style={{
-        padding: 14,
-        width: "100%",
-        background: "#fff",
-        color: "#111",
-        border: "1px solid #ccc",
-        borderRadius: 12,
-        fontWeight: "bold",
-        cursor: "pointer",
-      }}
-    >
-      10回分を追加する（100円）
-    </button>
-  </a>
-</div>
+              <a
+                href="https://buy.stripe.com/test_4gMcMZdep0e1avL8iDao803"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <button
+                  style={{
+                    padding: 14,
+                    width: "100%",
+                    background: "#fff",
+                    color: "#111",
+                    border: "1px solid #ccc",
+                    borderRadius: 12,
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                  }}
+                >
+                  10回分を追加する（100円）
+                </button>
+              </a>
+            </div>
           </div>
         )}
 
-        {/* ★ここ追加（フッター） */}
         <footer
           style={{
             marginTop: 32,
