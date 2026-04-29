@@ -160,7 +160,7 @@ if (!isPro && !hasCredit && usedCount >= MAX_FREE_COUNT) {
 
         <button
           onClick={handleGenerate}
-          disabled={loading || remainingCount <= 0}
+          disabled={loading || !text.trim() || !email.trim()}
           style={{
             marginTop: 16,
             width: "100%",
