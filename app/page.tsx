@@ -184,23 +184,25 @@ export default function Home() {
 
         <button
           onClick={handleGenerate}
-          disabled={loading || !text.trim() || !email.trim() || !canUse}
+          disabled={loading || !text.trim() || !email.trim()}
           style={{
-            marginTop: 16,
-            width: "100%",
-            padding: 14,
-            backgroundColor:
-              loading || !canUse ? "#999" : "#111",
-            color: "#fff",
-            border: "none",
-            borderRadius: 12,
-            cursor:
-              loading || !text.trim() || !email.trim() || !canUse
-                ? "not-allowed"
-                : "pointer",
-            fontWeight: "bold",
-          }}
-        >
+           marginTop: 16,
+           width: "100%",
+           padding: 14,
+          backgroundColor:
+          loading || !text.trim() || !email.trim()
+           ? "#999"
+           : "#111",
+           color: "#fff",
+           border: "none",
+           borderRadius: 12,
+           cursor:
+          loading || !text.trim() || !email.trim()
+        ? "not-allowed"
+        : "pointer",
+          fontWeight: "bold",
+         }}
+>
           {loading ? "生成中..." : "レポート構成を生成する"}
         </button>
 
@@ -232,7 +234,8 @@ export default function Home() {
                 marginTop: 16,
                 padding: 12,
                 width: "100%",
-                background: "#111",
+                backgroundColor:
+                 loading || !text.trim() || !email.trim() ? "#999" : "#111",
                 color: "#fff",
                 border: "none",
                 borderRadius: 12,
