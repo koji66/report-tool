@@ -122,6 +122,33 @@ export default function Home() {
   window.location.href = data.url;
 };
 
+const handleCopy = async () => {
+  await navigator.clipboard.writeText(result);
+  setCopied(true);
+  setTimeout(() => setCopied(false), 2000);
+};
+
+const handleManagePlan = async () => {
+  if (!email.trim()) {
+    alert("メールアドレスを入力してください");
+    return;
+  }
+
+  const res = await fetch("/api/create-portal-session", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.error || "解約ページを開けませんでした");
+    return;
+  }
+
+  window.location.href = data.url;
+};
+
   return (
     <main
       style={{
@@ -324,7 +351,22 @@ export default function Home() {
             </div>
           </div>
         )}
-
+          <button
+           onClick={handleManagePlan}
+           style={{
+            marginTop: 20,
+            width: "100%",
+            padding: 12,
+            background: "#fff",
+            color: "#111",
+            border: "1px solid #ccc",
+            borderRadius: 12,
+            fontWeight: "bold",
+            cursor: "pointer",
+  }}
+>
+  解約・プラン管理
+</button>
         <footer
           style={{
             marginTop: 32,
