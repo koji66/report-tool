@@ -19,77 +19,73 @@ export default function Home() {
 
   const remainingCount = Math.max(MAX_FREE_COUNT - usedCount, 0);
 
-  const handleGenerate = async () => {
-    if (!text.trim()) {
-      alert("メモを入力してください");
+const handleGenerate = async () => {
+  if (!text.trim()) {
+    alert("メモを入力してください");
+    return;
+  }
+
+  if (!email.trim()) {
+    alert("メールアドレスを入力してください");
+    return;
+  }
+
+  const statusRes = await fetch("/api/user-status", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+
+  const status = await statusRes.json();
+
+  if (!statusRes.ok) {
+    alert("利用状況の確認に失敗しました");
+    return;
+  }
+
+  const isPro = status.plan === "pro";
+  const hasCredit = status.extra_credits > 0;
+
+  if (!isPro && !hasCredit && usedCount >= MAX_FREE_COUNT) {
+    alert("無料回数は終了しました。追加購入または月額プランをご利用ください。");
+    return;
+  }
+
+  setLoading(true);
+  setResult("");
+
+  try {
+    const res = await fetch("/api/generate", {
+      method: "POST",
+      body: JSON.stringify({ text }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || "エラーが発生しました");
       return;
     }
 
-    // if (usedCount >= MAX_FREE_COUNT) {
-    //   alert("無料回数は3回までです");
-    //   return;
-    // }
-    if (!isPro && !hasCredit && usedCount >= MAX_FREE_COUNT) {
-       alert("無料回数は終了しました。追加購入または月額プランをご利用ください。");
-      return;
-      }
-    if (!email.trim()) {
-  alert("メールアドレスを入力してください");
-  return;
-}
+    setResult(data.result);
 
-const statusRes = await fetch("/api/user-status", {
-  method: "POST",
-  body: JSON.stringify({ email }),
-});
-
-const status = await statusRes.json();
-
-if (!statusRes.ok) {
-  alert("利用状況の確認に失敗しました");
-  return;
-}
-
-const isPro = status.plan === "pro";
-const hasCredit = status.extra_credits > 0;
-
-if (!isPro && !hasCredit && usedCount >= MAX_FREE_COUNT) {
-  alert("無料回数は終了しました。追加購入または月額プランをご利用ください。");
-  return;
-}
-    setLoading(true);
-    setResult("");
-
-    try {
-      const res = await fetch("/api/generate", {
+    if (!isPro && hasCredit) {
+      await fetch("/api/use-credit", {
         method: "POST",
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ email }),
       });
+    }
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.error || "エラーが発生しました");
-        return;
-      }
-
-      setResult(data.result);
-      if (status.plan !== "pro" && status.extra_credits > 0) {
-       await fetch("/api/use-credit", {
-        method: "POST",
-         body: JSON.stringify({ email }),
-      });
-}
-
+    if (!isPro && !hasCredit) {
       const nextCount = usedCount + 1;
       localStorage.setItem("count", String(nextCount));
       setUsedCount(nextCount);
-    } catch {
-      alert("通信エラーが発生しました");
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch {
+    alert("通信エラーが発生しました");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(result);
