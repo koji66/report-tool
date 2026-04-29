@@ -12,12 +12,7 @@ export async function POST(req: Request) {
       return Response.json({ error: "メモが空です" }, { status: 400 });
     }
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "user",
-          content: `
+    const prompt = `
 あなたは学生向けのレポート構成補助ツールです。
 
 以下のメモをもとに、次の形式で出力してください。
@@ -26,13 +21,13 @@ export async function POST(req: Request) {
 説明 / 比較 / 問題解決 / 意見・考察
 
 【整理されたノート】
-- 要点を整理
+・要点を整理
 
 【レポート構成】
-- 序論
-- 本論1
-- 本論2
-- 結論
+・序論
+・本論1
+・本論2
+・結論
 
 【序論の書き出し例】
 1文
@@ -40,9 +35,16 @@ export async function POST(req: Request) {
 【結論の書き出し例】
 1文
 
-メモ：
+メモ:
 ${text}
-`,
+`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "user",
+          content: prompt,
         },
       ],
     });
@@ -52,6 +54,7 @@ ${text}
     });
   } catch (error) {
     console.error(error);
+
     return Response.json(
       { error: "AI生成中にエラーが発生しました" },
       { status: 500 }
