@@ -25,10 +25,14 @@ export default function Home() {
       return;
     }
 
-    if (usedCount >= MAX_FREE_COUNT) {
-      alert("無料回数は3回までです");
+    // if (usedCount >= MAX_FREE_COUNT) {
+    //   alert("無料回数は3回までです");
+    //   return;
+    // }
+    if (!isPro && !hasCredit && usedCount >= MAX_FREE_COUNT) {
+       alert("無料回数は終了しました。追加購入または月額プランをご利用ください。");
       return;
-    }
+      }
     if (!email.trim()) {
   alert("メールアドレスを入力してください");
   return;
