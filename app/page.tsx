@@ -157,7 +157,9 @@ if (!isPro && !hasCredit && usedCount >= MAX_FREE_COUNT) {
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
-
+        <div>
+         {loading ? "loading中" : "ready"}
+        </div>
         <button
           onClick={handleGenerate}
           disabled={loading || !text.trim() || !email.trim()}
