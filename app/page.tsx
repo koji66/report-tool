@@ -151,8 +151,27 @@ const handleManagePlan = async () => {
         <h1 style={{ fontSize: 28, marginBottom: 8 }}>Structify</h1>
 
         <p style={{ color: "#555", lineHeight: 1.7, marginBottom: 16 }}>
-          授業メモや資料メモを貼るだけで、整理されたノートとレポート構成を作成します。
-        </p>
+  Structifyは、学生向けのレポート構成作成支援ツールです。
+  テーマやメモを入力するだけで、レポートの骨組みや整理されたノートを自動生成できます。
+</p>
+
+<div
+  style={{
+    background: "#fafafa",
+    border: "1px solid #eee",
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 18,
+    fontSize: 14,
+    color: "#444",
+    lineHeight: 1.7,
+  }}
+>
+  <div>・無料：初回3回まで利用可能</div>
+  <div>・有料：月額500円の無制限プラン</div>
+  <div>・追加購入：10回分を100円で追加可能</div>
+  <div>・解約：下部の「解約・プラン管理」から手続き可能</div>
+</div>
 
         <div
           style={{
