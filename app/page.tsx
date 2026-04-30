@@ -367,25 +367,40 @@ const handleManagePlan = async () => {
   解約・プラン管理
 </button>
         <footer
-          style={{
-            marginTop: 32,
-            paddingTop: 20,
-            borderTop: "1px solid #eee",
-            fontSize: 13,
-            color: "#666",
-            textAlign: "center",
-          }}
-        >
-          <a
-            href="/legal"
-            style={{
-              color: "#666",
-              textDecoration: "none",
-            }}
-          >
-            特定商取引法に基づく表記
-          </a>
-        </footer>
+  style={{
+    marginTop: 32,
+    paddingTop: 20,
+    borderTop: "1px solid #eee",
+    fontSize: 13,
+    color: "#666",
+    textAlign: "center",
+    lineHeight: 2,
+  }}
+>
+  <div>
+    <a href="/legal" style={{ color: "#666", textDecoration: "none" }}>
+      特定商取引法に基づく表記
+    </a>
+    {" / "}
+    <a href="/privacy" style={{ color: "#666", textDecoration: "none" }}>
+      プライバシーポリシー
+    </a>
+  </div>
+
+  <div>
+    お問い合わせ：
+    <a
+      href="mailto:あなたのメールアドレス"
+      style={{ color: "#666", textDecoration: "none" }}
+    >
+      takagame0127@gmail.com
+    </a>
+  </div>
+
+  <div>
+    月額プランの解約・変更は、サイト内の「解約・プラン管理」ボタンから行えます。
+  </div>
+</footer>
       </div>
     </main>
   );

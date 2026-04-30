@@ -32,6 +32,9 @@ export default function LegalPage() {
 
           <p><strong>支払方法：</strong>クレジットカード決済</p>
           <p><strong>支払時期：</strong>決済時に即時処理されます。</p>
+          <p><strong>サブスクリプションの解約について：</strong>
+                    月額プランの解約・変更は、サイト内の「解約・プラン管理」ボタンから行えます。
+          </p>
 
           <p><strong>商品の提供時期：</strong>決済完了後、即時に利用可能です。</p>
 
